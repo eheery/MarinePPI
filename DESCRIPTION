@@ -1,0 +1,18 @@
+Package: MarinePPI
+Type: Package
+Title: Calculates a standardized urbanization index for marine sites.
+Version: 0.0.1.0
+Authors@R: person("Eliza", "Heery", email = "eheery@uw.edu",
+  role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5318-8890"))
+Description: What the package does (one paragraph).
+RoxygenNote: 7.2.3
+URL: https://github.com/eheery/MarinePPI
+BugReports: https://github.com/eheery/MarinePPI/issues
+License: MIT + file LICENSE
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)
+LazyData: true

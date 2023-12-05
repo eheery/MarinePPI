@@ -1,0 +1,42 @@
+---
+title: "Calculating-PPI"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Calculating-PPI}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(MarinePPI)
+library(tidyverse)
+library(sf)
+```
+
+To run MarinePPI, you will need:
+
+* A viable **internet connection** so that MarinePPI subroutines can download rasters and shapefiles from GHSL,
+* A data frame of **geospatial coordinates** specifying the marine site locations, and;
+* To specify **buffer distance(s)** for PPI calculations. This is the radius that will be used for focal means and should be specified in kilometers (km). 
+
+## Survey Sites
+This vignette computes PPI for 22 sites in Puget Sound from Heery et al. (in preparation: *A standardized approach for quantifying urban-related losses in habitat-forming macroalgae and marine biogenic complexity*). The data frame containing lat/lons (in decimal degrees) is available as part of this package. A .csv of the file is also provided as a template: [here](<https://github.com/eheery/MarinePPI/blob/main/data/example_locations.csv>).
+
+```{r }
+# Convert to sf object
+sites <- st_as_sf(PugetSoundSites, coords = c("Lon_dd", "Lat_dd"), crs = 4326)
+sites
+```
+
+
+#### Geospatial coordinates
+
+The csv of geospatial coordinates for this example is available [here](<https://github.com/eheery/MarinePPI/blob/main/data/example_locations.csv>). We import it into R and convert it to an [sf POINTS](<https://r-spatial.github.io/sf/articles/sf1.html>) object as follows:
+
