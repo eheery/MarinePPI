@@ -6,7 +6,7 @@
 #' @param study_area_buffer  Extra buffer around the study area to which population density raster should be cropped. Default = 1km.
 #' @return A raster layer of population densities.
 #' @export
-compile_rasters <- function(tileIDs, data_directory = "downloads", study_area_buffer = 1000){
+compile_rasters <- function(tileIDs, study_area, data_directory = "downloads", study_area_buffer = 1000){
 
   tif_files <- list.files(data_directory)
   tif_files <- tif_files[endsWith(tif_files, ".tif")]
