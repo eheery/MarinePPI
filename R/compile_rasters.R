@@ -1,17 +1,19 @@
 #' Import raster tiles for the study area of interest and (if more than one) assemble into a single, mosaiced spatial data layer.
 #' 
-#' @param tileIDs vector of tile_ids for selected GHS raster tiles
-#' @param study_area  sf object of the study area grid in Molleweide projection to match the coordinate reference system of raster tiles
+#' @param tiles output from the get_ghs_tiles() function
 #' @param data_directory  Directory where GHS raster files have been downloaded and unzipped
 #' @param study_area_buffer  Extra buffer around the study area to which population density raster should be cropped. Default = 1km.
 #' @return A raster layer of population densities.
 #' @export
-compile_rasters <- function(tileIDs, study_area, data_directory = "downloads", study_area_buffer = 1000){
+compile_rasters <- function(tiles, data_directory = "downloads", study_area_buffer = 1000){
 
-  tif_files <- list.files(paste(getwd(), data_directory, sep = "/"))
+  tileIDs = tiles$SelectedTiles$SelectedTiles
+  study_area = tiles$GridMoll
+  
+  tif_files <- list.files(data_directory)
   tif_files <- tif_files[endsWith(tif_files, ".tif")]
   selected_tifs <- tif_files[stringr::str_detect(tif_files, tileIDs)]
-  tifs <- lapply( selected_tifs, function(i){ terra::rast(paste(getwd(), data_directory, i, sep = "/")) })
+  tifs <- lapply( selected_tifs, function(i){ terra::rast(paste(data_directory, i, sep = "/")) })
 
   if( length( tifs ) > 1){
     ghs_pop_mosaic <- tifs[[1]]

@@ -7,11 +7,11 @@
 #' @export
 download_ghs_tiles <- function(tileIDs, data_directory = getwd(), URL = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_BUILT_S_GLOBE_R2023A/GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100/V1-0/tiles/"){
 
-  lookup <- as.list(setNames(tileIDs, tileIDs))
+  lookup <- as.list(stats::setNames(tileIDs, tileIDs))
   pg <- rvest::read_html(URL)
   zip_files <- rvest::html_attr(rvest::html_nodes(pg, "a"), "href")
   zip_files <- unique(zip_files[endsWith(zip_files, ".zip")])
-  zip_files <- sapply( lookup, function(z){ zip_files[str_detect(zip_files, z)] })
+  zip_files <- sapply( lookup, function(z){ zip_files[stringr::str_detect(zip_files, z)] })
   lapply( zip_files, function(z){ 
     z_url <- paste0(URL, "/", z)
     temp <- tempfile() 

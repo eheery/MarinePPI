@@ -29,7 +29,7 @@ make_grid <- function(locs, buffer, dimensions = 0.5, bounds = NULL){
   studyarea <- sf::st_make_grid( sf::st_bbox( sf::st_buffer( locs, dist = bb_radius) ), n = c(1,1))
   
  if( !is.null(bounds)){
-    boundedarea <- st_make_grid( st_bbox( stats::setNames(bounds, c("xmin", "ymin", "xmax", "ymax")) ), n = c(1,1), crs = st_crs( locs))
+    boundedarea <- sf::st_make_grid( sf::st_bbox( stats::setNames(bounds, c("xmin", "ymin", "xmax", "ymax")) ), n = c(1,1), crs = sf::st_crs( locs))
     if( sapply( sf::st_covers( boundedarea, studyarea), length) == 0){  
       stop("Error: bounds smaller than buffer area")
     }else{
