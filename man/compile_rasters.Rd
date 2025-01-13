@@ -4,14 +4,20 @@
 \alias{compile_rasters}
 \title{Import raster tiles for the study area of interest and (if more than one) assemble into a single, mosaiced spatial data layer.}
 \usage{
-compile_rasters(tiles, data_directory = "downloads", study_area_buffer = 1000)
+compile_rasters(
+  tileIDs,
+  data_directory = "downloads",
+  study_area_buffer = 1000
+)
 }
 \arguments{
-\item{tiles}{output from the get_ghs_tiles() function}
+\item{tileIDs}{tiles selected in the get_ghs_tiles() function}
 
 \item{data_directory}{Directory where GHS raster files have been downloaded and unzipped}
 
 \item{study_area_buffer}{Extra buffer around the study area to which population density raster should be cropped. Default = 1km.}
+
+\item{study_area}{Mollweide grid of study area - output from get_ghs_tiles() function}
 }
 \value{
 A raster layer of population densities.
