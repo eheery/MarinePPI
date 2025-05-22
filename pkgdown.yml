@@ -1,0 +1,9 @@
+pandoc: 3.1.11
+pkgdown: 2.1.2
+pkgdown_sha: ~
+articles:
+  CalculatingPPI: CalculatingPPI.html
+last_built: 2025-05-22T08:30Z
+urls:
+  reference: https://eheery.github.io/MarinePPI/reference
+  article: https://eheery.github.io/MarinePPI/articles
