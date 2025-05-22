@@ -1,0 +1,120 @@
+---
+title: "CalculatingPPI"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CalculatingPPI}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Population Proximity Index (PPI)
+
+Population Pressure Index (PPI) provides a proxy for estimating the degree of human influence in the vicinity of marine field sites. It is calculated as the focal mean of population density within a specified buffer (e.g., 5 km, 10 km, 100 km) around each site, using high-resolution data from the Global Human Settlement Layer (GHSL; <https://ghsl.jrc.ec.europa.eu/>).
+
+This is especially useful in coastal and nearshore marine studies where traditional measures of "urbanness" or development may not be available at a meaningful spatial scale. By using population density as a spatially explicit proxy for urbanization intensity, we can derive indices that are comparable across urban, peri-urban, and rural seascapes.
+
+## Setup
+
+#### Installation
+
+You can install the development version of MarinePPI as follows:
+
+```{r eval = FALSE}
+devtools::install_github("eheery/MarinePPI")
+```
+
+Next, load the package into your R workspace:
+
+```{r setup}
+library(MarinePPI)
+```
+
+#### Specify the directory for raster downloads
+
+The MarinePPI workflow involves downloading raster data of population density from the Global Human Settlement Layer (GHSL; <https://ghsl.jrc.ec.europa.eu/>) for our study area. Although GHSL covers the entire globe, it is distributed in individual raster tiles to make downloading and processing more efficient.
+
+To manage these tiles and streamline the PPI calculations, MarinePPI requires a dedicated raster directory. This directory serves multiple purposes:
+
+* Stores downloaded tiles from GHSL so they are only downloaded once.
+* Caches mosaicked rasters (stitched together from multiple tiles) for locations that span tile boundaries.
+* Maintains a consistent file structure that our functions rely on to find, reuse, and write raster data efficiently.
+
+The directory should contain two subfolders (if these don't already exist, they will be created for you automatically as you use functions in MarinePPI):
+
+* downloads/ – where raw GHSL tiles are saved.
+* mosaics/ – where multi-tile mosaicked rasters are stored after stitching.
+
+You can point to any folder on your computer to serve as this raster directory. Just ensure the directory exists and that you have write access.
+
+```{r include = FALSE}
+raster_directory <- "C:\\Users\\Eliza\\OneDrive - UW\\Research\\Spatial Data Repository\\Population Density Rasters"
+```
+
+```{r eval = FALSE}
+# Specify raster directory on your computer
+raster_directory <- "your raster directory filepath"
+```
+
+## Specifications 
+
+The MarinePPI workflow uses a series of functions to identify which GHSL raster files overlap with the input coordinates, download any missing raster files into the downloads/ folder, and automatically mosaic multiple tiles into a single file (if needed), saved in the mosaics/ folder. You can reuse these files across sessions to reduce redundant computation and downloads.
+
+#### Field Site Locations
+
+First, we need create a data frame of geospatial coordinates for our field sites. These should be provided in **decimal degrees**, with **longitude in column 1** and **latitude in column 2** (*order matters!*). For instance, the code below creates a data frame called *sites* using a sample dataset from the MarinePPI package of 22 field locations in the Salish Sea. (*Note*: By default, MarinePPI functions assume that lon/lat values use the Coordinate Reference System, WGS84, which is used in GPS. If your coordinates use a different coordinate reference system, such as NAD83 (EPSG:4269), which is commonly used by US federal agencies (see this [useful guide](<https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf>), you specify this in the locations_crs argument of the *get_tile_list()* function below).
+
+```{r }
+# Load sample data set
+data("PugetSoundSites")
+head(PugetSoundSites)
+
+# Create data frame of site locations (with lon in COLUMN 1 and lat in COLUMN 2!!!)
+sites <- data.frame( 
+  lon = PugetSoundSites$Lon_dd,
+  lat = PugetSoundSites$Lat_dd)
+```
+
+#### Buffer Distances
+
+Next, we specify the buffer distances we wish to use for PPI calculations. These values will be used to specify the focal mean radii and should be provided **in kilometers**. Buffer distances can be provided either as a single value or as a vector of values, each in kilometers. Here, we use an example of 5 buffer distances between 1 km and 20 km: 
+
+```{r }
+# Specify radii for PPI calculations IN KILOMETERS
+b <- c(1, 2, 5, 10, 20)
+```
+
+#### Tile Schema
+
+Lastly, we need to access the shapefile of GHSL raster tile areas to discern which tiles overlap with our field sites and buffer distances. We do this using teh *get_tile_schema()* function:
+
+```{r }
+schema <- get_tile_schema(data_directory = raster_directory)
+```
+
+## Calculate PPI values
+
+Now we have all of the details needed to calculate Population Proximity Indices (PPI) for our field sites. The *calculate_ppi_chunked()* function identifies, downloads (if missing), and stitches together the population density raster layer for our respective study area. It then calculates PPI values in chunks (separately for each of the unique combination of raster tiles associated with our respective field sites and maximum buffer distance. It returns an *sf* points file 
+
+```{r }
+ppi_estimates <- calculate_ppi_chunked(
+  locations = sites,
+  tile_schema = schema,
+  data_directory = raster_directory,
+  buffers_km = b,       # you can adjust this to any buffer distances
+  progress = TRUE                  # shows progress bars
+)
+
+head(ppi_estimates)
+```
+
+
+
+
+

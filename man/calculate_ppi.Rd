@@ -2,22 +2,23 @@
 % Please edit documentation in R/calculate_ppi.R
 \name{calculate_ppi}
 \alias{calculate_ppi}
-\title{Calculate PPI a set of sites or grid cells given one or more buffer distances.}
+\title{Calculate PPI for a set of sites or grid cells given one or more buffer distances}
 \usage{
 calculate_ppi(locs, buffer, compiled_raster, progress = FALSE)
 }
 \arguments{
-\item{locs}{An sf object of geospatial coordinates (POINTS) or grid cells (POLYGONS).}
+\item{locs}{An \code{sf} object of geospatial features (typically POINTS or POLYGONS).}
 
-\item{buffer}{A vector of one or more buffer distance(s) that should be in focal mean calculations, expressed in kilometers.}
+\item{buffer}{A numeric vector of one or more buffer distances (in kilometers) to use in focal mean calculations.}
 
-\item{compiled_raster}{A raster of population densities}
+\item{compiled_raster}{A \code{terra} raster object containing population densities.}
 
-\item{progress}{if TRUE, display a progress bar while running exactextractr::exact_extract()}
+\item{progress}{Logical; if TRUE, shows progress bar during \code{exactextractr::exact_extract()} operations.}
 }
 \value{
-An sf object of PPI estimates for site.
+An \code{sf} object with additional columns for each PPI buffer (e.g., PPI-10km).
 }
 \description{
-Calculate PPI a set of sites or grid cells given one or more buffer distances.
+This function computes the focal mean of population density within one or more buffer distances
+around a set of input locations or polygons, using the exactextractr package for accurate spatial summaries.
 }
