@@ -16,10 +16,13 @@ Imports:
     sf,
     stringr,
     memoise,
-    dplyr
+    dplyr,
+    ggplot2
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    rnaturalearth,
+    rnaturalearthdata
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5)

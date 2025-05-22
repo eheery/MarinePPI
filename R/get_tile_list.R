@@ -4,10 +4,9 @@
 #' this function identifies which GHSL population raster tiles intersect a buffer
 #' of a specified radius around each point. It returns a list of tile ID vectors, one per input point.
 #'
-#' @param locations A data frame or matrix with two columns: longitude and latitude (in that order).
+#' @param locs_sf An sf object of sites (or grid polygons).
 #' @param tile_schema An `sf` object representing the GHSL tile grid schema, with a `tile_id` column.
 #' @param buffers_km Numeric buffer radius in kilometers (default is 10).
-#' @param locations_crs EPSG code for the coordinate reference system of the input locations (default is 4326, WGS84).
 #'
 #' @return A list of character vectors, each containing the GHSL tile IDs intersecting the buffer around a location.
 #'
@@ -20,14 +19,12 @@
 #'
 #' @export
 get_tile_list <- function(
-    locations,
+    locs_sf,
     tile_schema,
-    buffers_km = 10,
-    locations_crs = 4326){
+    buffers_km = 10){
 
-  locs <- sf::st_as_sf(locations, coords = c(1, 2), crs = locations_crs)
 
-  x <- sf::st_transform(locs, crs = sf::st_crs(tile_schema))
+  x <- sf::st_transform(locs_sf, crs = sf::st_crs(tile_schema))
 
   x_buff <- sf::st_buffer(x, dist = max(buffers_km * 1000))
 

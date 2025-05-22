@@ -75,10 +75,7 @@ First, we need create a data frame of geospatial coordinates for our field sites
 data("PugetSoundSites")
 head(PugetSoundSites)
 
-# Create data frame of site locations (with lon in COLUMN 1 and lat in COLUMN 2!!!)
-sites <- data.frame( 
-  lon = PugetSoundSites$Lon_dd,
-  lat = PugetSoundSites$Lat_dd)
+# Data frame of site locations must have longitude in COLUMN 1 and latitude in COLUMN 2!!! *both in decimal degrees)
 ```
 
 #### Buffer Distances
@@ -104,7 +101,7 @@ Now we have all of the details needed to calculate Population Proximity Indices 
 
 ```{r }
 ppi_estimates <- calculate_ppi_chunked(
-  locations = sites,
+  locations = PugetSoundSites,
   tile_schema = schema,
   data_directory = raster_directory,
   buffers_km = b,       # you can adjust this to any buffer distances
@@ -114,7 +111,39 @@ ppi_estimates <- calculate_ppi_chunked(
 head(ppi_estimates)
 ```
 
+#### Visualizing PPI Gradients
 
+In some cases, we may be more interested in visualizing gradients in population proximity across seascapes than in deriving PPI values for specific field sites. For this, we generate a grid overlaying the study area (or for the area within a specified bounding box) and estimate PPI for each grid cell. Depending on the resolution selected, this process can be time consuming. Use a coarser resolution for faster computation times. In the example below, we use coordinates from the coast of Eastern Australia. Land polygons are derived from the *ne_coutnries()* function in the rnaturalearth package. 
 
+```{r }
+library(ggplot2)
 
+# Study area as defined by coordinates in eastern Australia
+data("EasternAustraliaSites")
+head(EasternAustraliaSites)
+
+# Land polygons
+land <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+# Compute PPI within a 20km radius for 1km grid cells with bounds defined by 6 sites in the coast of eastern Australia
+ppi_gradients <- generate_ppi_grid(
+  lon = with(head(EasternAustraliaSites), Longitude),
+  lat = with(head(EasternAustraliaSites), Latitude),
+  buffer_km = 20,
+  tile_schema = schema,
+  data_directory = raster_directory,
+  land_polygons = land,
+  grid_resolution_km = 1) 
+
+visualize_gradients <- ggplot() + 
+  geom_sf(data = ppi_gradients$PPI, aes(fill = PPI20km), color = NA) +
+  geom_sf(data = ppi_gradients$Land ) 
+
+```
+
+```{r include = FALSE}
+plot(visualize_gradients)
+```
+
+The rudamentary map shown here is provided for visualizing purposes only. For more advanced mapping, one can save the spatial data layer generated from *generate_ppi_grid()* as a shapefile (using the *sf* function *st_write()*).
 

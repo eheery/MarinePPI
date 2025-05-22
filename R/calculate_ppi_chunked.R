@@ -17,12 +17,18 @@ calculate_ppi_chunked <- function(locations,
                                   locations_crs = 4326,
                                   tif_prefix = "GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100_V1_0_",
                                   progress = FALSE) {
-  # Step 1: Convert locations to sf
-  locs_sf <- sf::st_as_sf(locations, coords = c(1, 2), crs = locations_crs)
+  # Step 1: Get locations as an sf object
+  if( inherits(locations, "sf") ){
+    locs_sf <- sf::st_transform( locations, crs = locations_crs)
+  }else{
+    # Convert locations to sf
+    locs_sf <- sf::st_as_sf(locations, coords = c(1, 2), crs = locations_crs)}
   locs_sf$row_id <- seq_len(nrow(locs_sf))  # preserve original order
 
   # Step 2: Get tile list and raster paths
-  tile_list <- get_tile_list(locations, tile_schema, buffers_km, locations_crs)
+  tile_list <- get_tile_list(locs_sf, tile_schema, buffers_km)
+  tile_status <- download_tiles(tile_list, data_directory = data_directory)
+  mosaic_files <- create_tile_mosaics(tile_list, data_directory = data_directory)
   raster_paths <- get_rasters(tile_list, data_directory = data_directory, tif_prefix = tif_prefix, return_paths = TRUE)
 
   # Step 3: Assign file path to each location
@@ -45,7 +51,7 @@ calculate_ppi_chunked <- function(locations,
   final <- final[order(final$row_id), ]
   final$row_id <- NULL
   final$path <- sub(paste0("^", normalizePath(data_directory, winslash = "/"), "/?"), "", normalizePath(final$path, winslash = "/"))
-  out <- cbind( locations, sf::st_drop_geometry(final))
+  out <- cbind( locations,  sf::st_drop_geometry(final))
 
   return(out)
 }

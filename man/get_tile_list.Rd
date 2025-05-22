@@ -4,16 +4,14 @@
 \alias{get_tile_list}
 \title{Identify GHSL tile IDs needed to cover spatial locations with a specified buffer}
 \usage{
-get_tile_list(locations, tile_schema, buffers_km = 10, locations_crs = 4326)
+get_tile_list(locs_sf, tile_schema, buffers_km = 10)
 }
 \arguments{
-\item{locations}{A data frame or matrix with two columns: longitude and latitude (in that order).}
+\item{locs_sf}{An sf object of sites (or grid polygons).}
 
 \item{tile_schema}{An \code{sf} object representing the GHSL tile grid schema, with a \code{tile_id} column.}
 
 \item{buffers_km}{Numeric buffer radius in kilometers (default is 10).}
-
-\item{locations_crs}{EPSG code for the coordinate reference system of the input locations (default is 4326, WGS84).}
 }
 \value{
 A list of character vectors, each containing the GHSL tile IDs intersecting the buffer around a location.
