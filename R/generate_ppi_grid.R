@@ -11,9 +11,10 @@
 #' @param tile_schema An sf object of GHSL tile polygons with a `tile_id` column
 #' @param data_directory The base directory containing "downloads" and "mosaics" folders
 #' @param land_polygons A \code{sf} polygon object for land masses within the study area for which PPI calculations will be skipped (as a means of reducing computation time). Default = NULL.
-#' @param grid_resolution_km Numeric. Width and height of grid cells in kilometers.
+#' @param grid_resolution_km Numeric. Width and height of grid cells in kilometers. Default is 10 km; a finer resolution (ex: 1km) will provide a finer gradient and nicer visual, but takes a lot longer to run.
 #' @param locations_crs CRS code for the input coordinates (default is 4326)
 #' @param crs_projected CRS to use for grid generation and area calculations (default: 3857 Web Mercator).
+#' @param land_buffer Negative buffer distance (in meters) assumed for the land polygon (if provided) in case of inprecise mapping (so as not to eliminate grid cells from PPI calculations that aren't actually land). Default = 1000 m.
 #' @return A \code{data.frame} of grid centroids and PPI estimates at each buffer distance.
 #' @export
 generate_ppi_grid <- function(lon,
@@ -22,9 +23,10 @@ generate_ppi_grid <- function(lon,
                               tile_schema,
                               data_directory,
                               land_polygons = NULL,
-                              grid_resolution_km = 1,
+                              grid_resolution_km = 10,
                               locations_crs = 4326,
-                              crs_projected = 3857) {
+                              crs_projected = 3857,
+                              land_buffer = -1000) {
 
   requireNamespace("sf")
   requireNamespace("terra")
@@ -43,28 +45,49 @@ generate_ppi_grid <- function(lon,
 
   # Crop land to grid area
   if(!is.null(land_polygons)){
-    land_proj <- sf::st_transform(land_polygons, crs = crs_projected)
-    area_land <- sf::st_intersection(sf::st_as_sfc(bbox_wgs, crs = crs_projected), land_proj$geometry)
-    area_water <- sf::st_difference( sf::st_as_sfc(bbox_wgs, crs = crs_projected), area_land)
+    land_proj <- sf::st_combine( sf::st_transform(land_polygons, crs = crs_projected) )
+    land_reduced <- sf::st_buffer( land_proj, dist = land_buffer)
+    area_land <- sf::st_intersection(sf::st_as_sfc(bbox_wgs, crs = crs_projected), land_reduced)
+    area_water <- sf::st_difference( sf::st_as_sfc(bbox_wgs, crs = crs_projected), area_land )
     # Subset just grids that are not land (to cut down on the number of calculations needed)
     intersection <- sf::st_intersects(grid, area_water)
-    grid_filtered <- grid[ which( sapply( intersection, length ) > 0),]
+    calc_i <- which( sapply( intersection, length ) > 0)
   }else{
-    grid_filtered <- grid
+    calc_i <- 1:length(grid)
   }
 
-  # Run PPI estimation for all buffer distances
-  message("Calculating PPI... this may take time.")
-  calcs <- calculate_ppi_chunked(
-    locations = sf::st_as_sf(grid_filtered),
-    tile_schema = tile_schema,  # if using GHSL logic, update here
-    data_directory = data_directory,  # update as needed
-    buffers_km = buffer_km,
-    locations_crs = locations_crs,
-    progress = TRUE)
+  locs_sf <- sf::st_as_sf(grid)
+  locs_sf$cell_id <- seq_len(nrow(locs_sf))  # preserve original order
+  calcs_sf <- locs_sf[calc_i,]
 
-  out <- list(
-    PPI = calcs,
-    Land = area_land)
+  # Step 2: Get tile list and raster paths
+  tile_list <- get_tile_list(calcs_sf, tile_schema, buffers_km)
+  tile_status <- download_tiles(tile_list, data_directory = data_directory)
+  mosaic_files <- create_tile_mosaics(tile_list, data_directory = data_directory)
+  raster_paths <- get_rasters(tile_list, data_directory = data_directory, tif_prefix = tif_prefix, return_paths = TRUE)
+
+  # Step 3: Assign file path to each location
+  calcs_sf$path <- unlist(raster_paths)  # safe because output is one path per location
+
+  # Step 4: Split by unique raster file and compute PPI per chunk
+  calc_groups <- split(calcs_sf, calcs_sf$path)
+  results <- list()
+
+  for (p in names(calc_groups)) {
+    message("Processing raster: ", basename(p))
+    r <- terra::rast(p)
+    # terra::minmax(r)  # ensure min/max is available
+    ppi_result <- calculate_ppi(locs = calc_groups[[p]], buffer = buffers_km, compiled_raster = r, progress = progress)
+    results[[p]] <- ppi_result
+  }
+
+  # Step 5: Recombine and restore original order
+  results_sf <-  dplyr::bind_rows( results )
+  results_sf$tile <- sub(paste0("^", normalizePath(data_directory, winslash = "/"), "/?"), "", normalizePath(results_sf$path, winslash = "/"))
+  results_sf$path <- NULL
+  results_sf <- dplyr::full_join(  results_sf, sf::st_drop_geometry(locs_sf))
+  final <- results_sf[order( results_sf$cell_id),]
+  out <- dplyr::left_join( results_sf, sf::st_drop_geometry(locs_sf))
+  out <- dplyr::rename( out, geometry = x)
   return(out)
 }
