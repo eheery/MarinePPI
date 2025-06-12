@@ -10,7 +10,7 @@
 #' @param buffer_km Numeric vector of one or more buffer radii (in kilometers) used to estimate PPI.
 #' @param tile_schema An sf object of GHSL tile polygons with a `tile_id` column
 #' @param data_directory The base directory containing "downloads" and "mosaics" folders
-#' @param land_polygons An \code{sf} object representing land areas (e.g., from Natural Earth or OpenStreetMap).
+#' @param land_polygons A \code{sf} polygon object for land masses within the study area for which PPI calculations will be skipped (as a means of reducing computation time). Default = NULL.
 #' @param grid_resolution_km Numeric. Width and height of grid cells in kilometers.
 #' @param locations_crs CRS code for the input coordinates (default is 4326)
 #' @param crs_projected CRS to use for grid generation and area calculations (default: 3857 Web Mercator).
@@ -21,7 +21,7 @@ generate_ppi_grid <- function(lon,
                               buffer_km = c(5, 10, 20),
                               tile_schema,
                               data_directory,
-                              land_polygons,
+                              land_polygons = NULL,
                               grid_resolution_km = 1,
                               locations_crs = 4326,
                               crs_projected = 3857) {
@@ -42,13 +42,16 @@ generate_ppi_grid <- function(lon,
     crs = crs_projected )
 
   # Crop land to grid area
-  land_proj <- sf::st_transform(land_polygons, crs = crs_projected)
-  area_land <- sf::st_intersection(sf::st_as_sfc(bbox_wgs, crs = crs_projected), land_proj$geometry)
-  area_water <- sf::st_difference( sf::st_as_sfc(bbox_wgs, crs = crs_projected), area_land)
-
-  # Subset just grids that are not land (to cut down on the number of calculations needed)
-  intersection <- sf::st_intersects(grid, area_water)
-  grid_filtered <- grid[ which( sapply( intersection, length ) > 0),]
+  if(!is.null(land_polygons)){
+    land_proj <- sf::st_transform(land_polygons, crs = crs_projected)
+    area_land <- sf::st_intersection(sf::st_as_sfc(bbox_wgs, crs = crs_projected), land_proj$geometry)
+    area_water <- sf::st_difference( sf::st_as_sfc(bbox_wgs, crs = crs_projected), area_land)
+    # Subset just grids that are not land (to cut down on the number of calculations needed)
+    intersection <- sf::st_intersects(grid, area_water)
+    grid_filtered <- grid[ which( sapply( intersection, length ) > 0),]
+  }else{
+    grid_filtered <- grid
+  }
 
   # Run PPI estimation for all buffer distances
   message("Calculating PPI... this may take time.")
