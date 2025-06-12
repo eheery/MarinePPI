@@ -1,6 +1,8 @@
 #' Chunked PPI calculation for each unique tile or mosaic combination
 #'
-#' @param locations A data frame or matrix with longitude and latitude (in that order)
+#' @param locations A data frame or matrix with longitude and latitude
+#' @param longitude_col The name of the column containing longitude in decimal degrees (character)
+#' @param latitude_col The name of the column containing latitude in decimal degrees (character)
 #' @param tile_schema An sf object of GHSL tile polygons with a `tile_id` column
 #' @param data_directory The base directory containing "downloads" and "mosaics" folders
 #' @param buffers_km Vector of buffer distances (in km) to use in PPI calculation
@@ -11,6 +13,8 @@
 #' @return An sf object with PPI columns, in the same row order as `locations`
 #' @export
 calculate_ppi_chunked <- function(locations,
+                                  longitude_col,
+                                  latitude_col,
                                   tile_schema,
                                   data_directory,
                                   buffers_km = c(5, 10, 20),
@@ -22,7 +26,7 @@ calculate_ppi_chunked <- function(locations,
     locs_sf <- sf::st_transform( locations, crs = locations_crs)
   }else{
     # Convert locations to sf
-    locs_sf <- sf::st_as_sf(locations, coords = c(1, 2), crs = locations_crs)}
+    locs_sf <- sf::st_as_sf(locations, coords = c(longitude_col, latitude_col), crs = locations_crs)}
   locs_sf$row_id <- seq_len(nrow(locs_sf))  # preserve original order
 
   # Step 2: Get tile list and raster paths
