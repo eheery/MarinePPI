@@ -39,7 +39,7 @@ library(MarinePPI)
 site_data <- read.csv("data/sites.csv")
 
 # Load tile schema
-tile_schema <- sf::read_sf(system.file("extdata", "ghsl_tile_schema.gpkg", package = "MarinePPI"))
+tile_schema <- get_tile_schema( "data/rasters" )
 
 # Calculate PPI using pre-downloaded rasters
 ppi_results <- calculate_ppi_chunked(
