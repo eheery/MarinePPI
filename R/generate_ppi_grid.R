@@ -89,5 +89,9 @@ generate_ppi_grid <- function(lon,
   final <- results_sf[order( results_sf$cell_id),]
   out <- dplyr::left_join( results_sf, sf::st_drop_geometry(locs_sf))
   out <- dplyr::rename( out, geometry = x)
+
+  if(!is.null(land_polygons)){
+    out <- sf::st_transform(out, crs = sf::st_crs(land_polygons))
+  }
   return(out)
 }
