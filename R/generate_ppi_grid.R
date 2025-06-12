@@ -7,7 +7,7 @@
 #'
 #' @param lon Numeric vector of length 1 or greater: longitudes in decimal degrees representing the range (or centroid) of the study area.
 #' @param lat Numeric vector of length 2: latitudes in decimal degrees representing the range (or centroid) of the study area.
-#' @param buffer_km Numeric vector of one or more buffer radii (in kilometers) used to estimate PPI.
+#' @param buffers_km Numeric vector of one or more buffer radii (in kilometers) used to estimate PPI.
 #' @param tile_schema An sf object of GHSL tile polygons with a `tile_id` column
 #' @param data_directory The base directory containing "downloads" and "mosaics" folders
 #' @param land_polygons A \code{sf} polygon object for land masses within the study area for which PPI calculations will be skipped (as a means of reducing computation time). Default = NULL.
@@ -19,7 +19,7 @@
 #' @export
 generate_ppi_grid <- function(lon,
                               lat,
-                              buffer_km = c(5, 10, 20),
+                              buffers_km = c(5, 10, 20),
                               tile_schema,
                               data_directory,
                               land_polygons = NULL,
@@ -34,7 +34,7 @@ generate_ppi_grid <- function(lon,
 
   # Create buffered bounding box
   locs <- sf::st_as_sf( expand.grid( x = lon, y = lat ), coords = c("x", "y"), crs = locations_crs)
-  bbox_wgs <-  sf::st_bbox( sf::st_buffer( sf::st_transform(locs, crs = crs_projected),  dist = max(buffer_km)*1000) )
+  bbox_wgs <-  sf::st_bbox( sf::st_buffer( sf::st_transform(locs, crs = crs_projected),  dist = max(buffers_km)*1000) )
 
   # Generate grid
   grid <- sf::st_make_grid(
