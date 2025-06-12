@@ -55,7 +55,7 @@ calculate_ppi_chunked <- function(locations,
   final <- final[order(final$row_id), ]
   final$row_id <- NULL
   final$path <- sub(paste0("^", normalizePath(data_directory, winslash = "/"), "/?"), "", normalizePath(final$path, winslash = "/"))
-  out <- cbind( locations,  sf::st_drop_geometry(final))
+  out <-  sf::st_drop_geometry(final)
 
   return(out)
 }
