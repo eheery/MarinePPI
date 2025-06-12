@@ -15,7 +15,7 @@
 #' @param locations_crs CRS code for the input coordinates (default is 4326)
 #' @param crs_projected CRS to use for grid generation and area calculations (default: 3857 Web Mercator).
 #' @param land_buffer Negative buffer distance (in meters) assumed for the land polygon (if provided) in case of inprecise mapping (so as not to eliminate grid cells from PPI calculations that aren't actually land). Default = 1000 m.
-#' @return A \code{data.frame} of grid centroids and PPI estimates at each buffer distance.
+#' @return A \code{list} of PPI, an \code{sf} polygon object of grid cells with computed PPI estimates for each buffer distance, and (if land polygons were provided) Land, the cropped land polygons in the same coordinate reference system as grid polygons.
 #' @export
 generate_ppi_grid <- function(lon,
                               lat,
@@ -87,11 +87,9 @@ generate_ppi_grid <- function(lon,
   results_sf$path <- NULL
   results_sf <- dplyr::full_join(  results_sf, sf::st_drop_geometry(locs_sf))
   final <- results_sf[order( results_sf$cell_id),]
-  out <- dplyr::left_join( results_sf, sf::st_drop_geometry(locs_sf))
-  out <- dplyr::rename( out, geometry = x)
-
-  if(!is.null(land_polygons)){
-    out <- sf::st_transform(out, crs = sf::st_crs(land_polygons))
-  }
+  final <- dplyr::left_join( final, sf::st_drop_geometry(locs_sf))
+  final <- dplyr::rename( final, geometry = x)
+  out <- list( PPI = final )
+  if(!is.null(land_polygons)){out$Land <- area_land }
   return(out)
 }
