@@ -25,7 +25,7 @@ calculate_ppi <- function(locs, buffer, compiled_raster, progress = FALSE) {
     function(b) {
       message("... ", b, "km buffer")
       buffered <- sf::st_buffer(sf::st_transform(locs, terra::crs(compiled_raster)), dist = b * 1000)
-      exactextractr::exact_extract(compiled_raster[[1]], buffered, 'mean', progress = progress)
+      exactextractr::exact_extract(compiled_raster[[1]], buffered, 'mean', progress = progress, default_value = 0)
     }
   )
 
