@@ -37,7 +37,7 @@ generate_ppi_grid <- function(lon,
   requireNamespace("dplyr")
 
   # Create buffered bounding box
-  locs <- sf::st_as_sf( expand.grid( x = lon, y = lat ), coords = c("x", "y"), crs = locations_crs)
+  locs <- sf::st_as_sf( expand.grid( lon, lat ), coords = c(1, 2), crs = locations_crs)
   bbox_wgs <-  sf::st_bbox( sf::st_buffer( sf::st_transform(locs, crs = crs_projected),  dist = max(buffers_km)*1000) )
 
   # Generate grid

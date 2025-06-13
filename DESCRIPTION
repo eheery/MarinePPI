@@ -16,8 +16,7 @@ Imports:
     sf,
     stringr,
     memoise,
-    dplyr,
-    ggplot2
+    dplyr
 Suggests: 
     rmarkdown,
     rnaturalearth,
