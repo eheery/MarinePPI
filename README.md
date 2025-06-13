@@ -56,7 +56,7 @@ ppi_results <- calculate_ppi_chunked(
 A detailed walkthrough is available in the package vignette:
 
 ``` r
-vignette("CalculatePPI", package = "MarinePPI")
+vignette("CalculatingPPI", package = "MarinePPI")
 ```
 
 Or view it on GitHub.
