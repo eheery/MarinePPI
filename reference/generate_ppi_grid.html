@@ -22,10 +22,6 @@ at one or more buffer distances."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/CalculatingPPI.html">CalculatingPPI</a></li>
-  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -53,13 +49,16 @@ at one or more buffer distances.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_ppi_grid</span><span class="op">(</span></span>
 <span>  <span class="va">lon</span>,</span>
 <span>  <span class="va">lat</span>,</span>
-<span>  buffer_km <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span>,</span>
+<span>  buffers_km <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span>,</span>
 <span>  <span class="va">tile_schema</span>,</span>
 <span>  <span class="va">data_directory</span>,</span>
-<span>  <span class="va">land_polygons</span>,</span>
-<span>  grid_resolution_km <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  land_polygons <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  grid_resolution_km <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  locations_crs <span class="op">=</span> <span class="fl">4326</span>,</span>
-<span>  crs_projected <span class="op">=</span> <span class="fl">3857</span></span>
+<span>  crs_projected <span class="op">=</span> <span class="fl">3857</span>,</span>
+<span>  land_buffer <span class="op">=</span> <span class="op">-</span><span class="fl">1000</span>,</span>
+<span>  tif_prefix <span class="op">=</span> <span class="st">"GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100_V1_0_"</span>,</span>
+<span>  progress <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -75,7 +74,7 @@ at one or more buffer distances.</p>
 <dd><p>Numeric vector of length 2: latitudes in decimal degrees representing the range (or centroid) of the study area.</p></dd>
 
 
-<dt id="arg-buffer-km">buffer_km<a class="anchor" aria-label="anchor" href="#arg-buffer-km"></a></dt>
+<dt id="arg-buffers-km">buffers_km<a class="anchor" aria-label="anchor" href="#arg-buffers-km"></a></dt>
 <dd><p>Numeric vector of one or more buffer radii (in kilometers) used to estimate PPI.</p></dd>
 
 
@@ -88,11 +87,11 @@ at one or more buffer distances.</p>
 
 
 <dt id="arg-land-polygons">land_polygons<a class="anchor" aria-label="anchor" href="#arg-land-polygons"></a></dt>
-<dd><p>An <code>sf</code> object representing land areas (e.g., from Natural Earth or OpenStreetMap).</p></dd>
+<dd><p>A <code>sf</code> polygon object for land masses within the study area for which PPI calculations will be skipped (as a means of reducing computation time). Default = NULL.</p></dd>
 
 
 <dt id="arg-grid-resolution-km">grid_resolution_km<a class="anchor" aria-label="anchor" href="#arg-grid-resolution-km"></a></dt>
-<dd><p>Numeric. Width and height of grid cells in kilometers.</p></dd>
+<dd><p>Numeric. Width and height of grid cells in kilometers. Default is 10 km; a finer resolution (ex: 1km) will provide a finer gradient and nicer visual, but takes a lot longer to run.</p></dd>
 
 
 <dt id="arg-locations-crs">locations_crs<a class="anchor" aria-label="anchor" href="#arg-locations-crs"></a></dt>
@@ -102,10 +101,22 @@ at one or more buffer distances.</p>
 <dt id="arg-crs-projected">crs_projected<a class="anchor" aria-label="anchor" href="#arg-crs-projected"></a></dt>
 <dd><p>CRS to use for grid generation and area calculations (default: 3857 Web Mercator).</p></dd>
 
+
+<dt id="arg-land-buffer">land_buffer<a class="anchor" aria-label="anchor" href="#arg-land-buffer"></a></dt>
+<dd><p>Negative buffer distance (in meters) assumed for the land polygon (if provided) in case of inprecise mapping (so as not to eliminate grid cells from PPI calculations that aren't actually land). Default = 1000 m.</p></dd>
+
+
+<dt id="arg-tif-prefix">tif_prefix<a class="anchor" aria-label="anchor" href="#arg-tif-prefix"></a></dt>
+<dd><p>Prefix used in naming .tif files (default matches GHSL 2023 dataset)</p></dd>
+
+
+<dt id="arg-progress">progress<a class="anchor" aria-label="anchor" href="#arg-progress"></a></dt>
+<dd><p>Logical. If TRUE, show progress bars in exact_extract</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>data.frame</code> of grid centroids and PPI estimates at each buffer distance.</p>
+    <p>A <code>list</code> of PPI, an <code>sf</code> polygon object of grid cells with computed PPI estimates for each buffer distance, and (if land polygons were provided) Land, the cropped land polygons in the same coordinate reference system as grid polygons.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

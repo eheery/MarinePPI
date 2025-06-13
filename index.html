@@ -32,12 +32,6 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/CalculatingPPI.html">CalculatingPPI</a></li>
-  </ul>
-</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -63,41 +57,127 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"eheery/MarinePPI"</span><span class="op">)</span></span></code></pre></div>
+<p>Next, load the package into your R workspace:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://eheery.github.io/MarinePPI/">MarinePPI</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="specify-the-directory-for-raster-downloads">Specify the directory for raster downloads<a class="anchor" aria-label="anchor" href="#specify-the-directory-for-raster-downloads"></a>
+</h4>
+<p>The MarinePPI workflow involves downloading raster data of population density from the Global Human Settlement Layer (GHSL; <a href="https://ghsl.jrc.ec.europa.eu/" class="external-link uri">https://ghsl.jrc.ec.europa.eu/</a>) for our study area. Although GHSL covers the entire globe, it is distributed in individual raster tiles to make downloading and processing more efficient.</p>
+<p>To manage these tiles and streamline the PPI calculations, MarinePPI requires a dedicated raster directory. This directory serves multiple purposes:</p>
+<ul>
+<li>Stores downloaded tiles from GHSL so they are only downloaded once.</li>
+<li>Caches mosaicked rasters (stitched together from multiple tiles) for locations that span tile boundaries.</li>
+<li>Maintains a consistent file structure that our functions rely on to find, reuse, and write raster data efficiently.</li>
+</ul>
+<p>The directory should contain two subfolders (if these don’t already exist, they will be created for you automatically as you use functions in MarinePPI):</p>
+<ul>
+<li>downloads/ – where raw GHSL tiles are saved.</li>
+<li>mosaics/ – where multi-tile mosaicked rasters are stored after stitching.</li>
+</ul>
+<p>You can point to any folder on your computer to serve as this raster directory. Just ensure the directory exists and that you have write access.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Specify raster directory on your computer</span></span>
+<span><span class="va">raster_directory</span> <span class="op">&lt;-</span> <span class="st">"your raster directory filepath"</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
-<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+<h2 id="specifications">Specifications<a class="anchor" aria-label="anchor" href="#specifications"></a>
 </h2>
-<p>To calculate PPI for a set of coordinates, you’ll need:</p>
-<ul>
-<li>A CSV or data frame of longitude/latitude points</li>
-<li>A vector of buffer distances in kilometers (radii within which PPI should be calculated)</li>
-<li>Internet access to retrieve the GHSL tile schema and raster tiles (using functions from this package)</li>
-</ul>
-<p>Here is a minimal example:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://eheery.github.io/MarinePPI/">MarinePPI</a></span><span class="op">)</span></span>
+<p>The MarinePPI workflow uses a series of functions to identify which GHSL raster files overlap with the input coordinates, download any missing raster files into the downloads/ folder, and automatically mosaic multiple tiles into a single file (if needed), saved in the mosaics/ folder. You can reuse these files across sessions to reduce redundant computation and downloads.</p>
+<div class="section level4">
+<h4 id="field-site-locations">Field Site Locations<a class="anchor" aria-label="anchor" href="#field-site-locations"></a>
+</h4>
+<p>First, we need create a data frame of geospatial coordinates <strong><em>in decimal degrees</em></strong> for our field sites. As an example, the sample dataset, <em>PugetSoundSites</em>, includes 22 field locations in the Salish Sea. (<em>Note</em>: By default, MarinePPI functions assume that lon/lat values use the Coordinate Reference System, WGS84, which is used in GPS. If your coordinates use a different coordinate reference system, such as NAD83 (EPSG:4269), which is commonly used by US federal agencies (see this <a href="https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf" class="external-link">useful guide</a>, you will need to specify this in the `locations_crs` argument of the <em>get_tile_list()</em> function below).</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Load sample data set</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"PugetSoundSites"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="buffer-distances">Buffer Distances<a class="anchor" aria-label="anchor" href="#buffer-distances"></a>
+</h4>
+<p>Next, we specify the buffer distances we wish to use for PPI calculations. These values will be used to specify the focal mean radii and should be provided <strong>in kilometers</strong>. Buffer distances can be provided either as a single value or as a vector of values, each in kilometers. Here, we use an example of 5 buffer distances between 1 km and 20 km:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Specify radii for PPI calculations IN KILOMETERS</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="tile-schema">Tile Schema<a class="anchor" aria-label="anchor" href="#tile-schema"></a>
+</h4>
+<p>Lastly, we need to access the shapefile of GHSL raster tile areas to discern which tiles overlap with our field sites and buffer distances. We do this using teh <em>get_tile_schema()</em> function:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">schema</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_tile_schema.html">get_tile_schema</a></span><span class="op">(</span>data_directory <span class="op">=</span> <span class="va">raster_directory</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="calculate-ppi-values">Calculate PPI values<a class="anchor" aria-label="anchor" href="#calculate-ppi-values"></a>
+</h2>
+<p>Now we have all of the details needed to calculate Population Proximity Indices (PPI) for our field sites. The <em>calculate_ppi_chunked()</em> function identifies, downloads (if missing), and stitches together the population density raster layer for our respective study area. It then calculates PPI values in chunks (separately for each of the unique combination of raster tiles associated with our respective field sites and maximum buffer distance. It returns an <em>sf</em> points file</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ppi_estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calculate_ppi_chunked.html">calculate_ppi_chunked</a></span><span class="op">(</span></span>
+<span>  locations <span class="op">=</span> <span class="va">PugetSoundSites</span>,</span>
+<span>  longitude_col <span class="op">=</span> <span class="st">"Lon_dd"</span>,</span>
+<span>  latitude_col <span class="op">=</span> <span class="st">"Lat_dd"</span>,</span>
+<span>  tile_schema <span class="op">=</span> <span class="va">schema</span>,</span>
+<span>  data_directory <span class="op">=</span> <span class="va">raster_directory</span>,</span>
+<span>  buffers_km <span class="op">=</span> <span class="va">b</span>,       <span class="co"># you can adjust this to any buffer distances</span></span>
+<span>  progress <span class="op">=</span> <span class="cn">TRUE</span>                  <span class="co"># shows progress bars</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="sites-that-span-multiple-tiles">Sites that span multiple tiles<a class="anchor" aria-label="anchor" href="#sites-that-span-multiple-tiles"></a>
+</h4>
+<p>In the example above, all of the sites in <em>PugetSoundSites</em> happen to fall within a single GHSL raster tile area (as indicated in the tile column of our output). If your sites span multiple GHSL rastser tile areas, <em>calculate_ppi_chunked()</em> will mosaic tiles together as needed and save them as new rasters in the mosaics/ folder in your raster directory. Here’s an example using coordinates from the coast of Eastern Australia:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Study area as defined by coordinates in eastern Australia</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"EasternAustraliaSites"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Load site coordinates</span></span>
-<span><span class="va">site_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"data/sites.csv"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load tile schema</span></span>
-<span><span class="va">tile_schema</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_tile_schema.html">get_tile_schema</a></span><span class="op">(</span> <span class="st">"data/rasters"</span> <span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Calculate PPI using pre-downloaded rasters</span></span>
-<span><span class="va">ppi_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calculate_ppi_chunked.html">calculate_ppi_chunked</a></span><span class="op">(</span></span>
-<span>  locations <span class="op">=</span> <span class="va">site_data</span>,</span>
-<span>  tile_schema <span class="op">=</span> <span class="va">tile_schema</span>,</span>
-<span>  data_directory <span class="op">=</span> <span class="st">"data/ghsl_tiles"</span></span>
+<span><span class="va">ppi_estimates2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calculate_ppi_chunked.html">calculate_ppi_chunked</a></span><span class="op">(</span></span>
+<span>  locations <span class="op">=</span> <span class="va">EasternAustraliaSites</span>,</span>
+<span>  longitude_col <span class="op">=</span> <span class="st">"Longitude"</span>,</span>
+<span>  latitude_col <span class="op">=</span> <span class="st">"Latitude"</span>,</span>
+<span>  tile_schema <span class="op">=</span> <span class="va">schema</span>,</span>
+<span>  data_directory <span class="op">=</span> <span class="va">raster_directory</span>,</span>
+<span>  buffers_km <span class="op">=</span> <span class="va">b</span>,       <span class="co"># you can adjust this to any buffer distances</span></span>
+<span>  progress <span class="op">=</span> <span class="cn">TRUE</span>                  <span class="co"># shows progress bars</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level4">
+<h4 id="visualizing-ppi-gradients">Visualizing PPI Gradients<a class="anchor" aria-label="anchor" href="#visualizing-ppi-gradients"></a>
+</h4>
+<p>In some cases, we may be more interested in visualizing gradients in population proximity across seascapes rather than in deriving PPI values for specific field sites. The <em>generate_ppi_grid()</em> function calculates population proximity estimates for a grid of cells for a given area and resolution. In the example below, we estimate PPI within a 20 km buffer distance for each cell in a 5 x 5 km grid for the Salish Sea bioregion. Land polygons from the <em>ne_coutnries()</em> function in the rnaturalearth package are specified in the land_polygon function in order to cut down on computation time (when land_polygons != NULL, PPI calculations are skipped for grid cells that overlap completely with land).</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Set bounds </span></span>
+<span><span class="va">salish_sea_region</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">125.93</span>, <span class="op">-</span><span class="fl">120.65</span><span class="op">)</span>,</span>
+<span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">46.59</span>, <span class="fl">50.86</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Land polygons</span></span>
+<span><span class="va">land</span> <span class="op">&lt;-</span> <span class="fu">rnaturalearth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html" class="external-link">ne_countries</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="st">"large"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compute PPI gradient</span></span>
+<span><span class="va">ppi_gradient</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_ppi_grid.html">generate_ppi_grid</a></span><span class="op">(</span></span>
+<span>  lon <span class="op">=</span> <span class="va">salish_sea_region</span><span class="op">$</span><span class="va">lon</span>,</span>
+<span>  lat <span class="op">=</span> <span class="va">salish_sea_region</span><span class="op">$</span><span class="va">lat</span>,</span>
+<span>  buffers_km <span class="op">=</span> <span class="fl">20</span>, <span class="co"># 20 km buffer radius for PPI calculations</span></span>
+<span>  tile_schema <span class="op">=</span> <span class="va">schema</span>,</span>
+<span>  data_directory <span class="op">=</span> <span class="va">raster_directory</span>,</span>
+<span>  land_polygons <span class="op">=</span> <span class="va">land</span>,</span>
+<span>  grid_resolution_km <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="co"># 5 km x 5 km grid cells</span></span>
+<span></span>
+<span><span class="co"># Visualize</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ppi_gradient</span><span class="op">$</span><span class="va">PPI</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">PPI20km</span><span class="op">)</span>, color <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ppi_gradient</span><span class="op">$</span><span class="va">Land</span> <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The rudamentary map shown here is provided for visualizing purposes only. For more advanced mapping, one can save the spatial data layer generated from <em>generate_ppi_grid()</em> as a shapefile (using the <em>sf</em> function <em>st_write()</em>).</p>
+<figure><img src="reference/figures/salish_sea_map.png" alt="Fig. 1 Visualization of PPI gradient computed for the Salish Sea region. Code for generating the figure is shown above, using a 20km buffer radius for 5 km resolution for grid cells."><figcaption aria-hidden="true">
+Fig. 1 Visualization of PPI gradient computed for the Salish Sea region. Code for generating the figure is shown above, using a 20km buffer radius for 5 km resolution for grid cells.
+</figcaption></figure>
 </div>
-<div class="section level1">
-<h1 id="vignette">Vignette<a class="anchor" aria-label="anchor" href="#vignette"></a>
-</h1>
-<p>A detailed walkthrough is available in the package vignette:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"CalculatePPI"</span>, package <span class="op">=</span> <span class="st">"MarinePPI"</span><span class="op">)</span></span></code></pre></div>
-<p>Or view it on GitHub.</p>
+</div>
 </div>
 <div class="section level1">
 <h1 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
