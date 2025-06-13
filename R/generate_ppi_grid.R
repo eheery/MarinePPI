@@ -92,7 +92,7 @@ generate_ppi_grid <- function(lon,
   results_sf$path <- NULL
   final <- results_sf[order( results_sf$cell_id),]
   final <- suppressMessages( dplyr::left_join( final, sf::st_drop_geometry(locs_sf)) )
-  final <- dplyr::rename( final, geometry = x)
+  final <- dplyr::rename( final, geometry = "x")
   out <- list( PPI = final )
   if(!is.null(land_polygons)){  out$Land <- area_proj    }
   return(out)
