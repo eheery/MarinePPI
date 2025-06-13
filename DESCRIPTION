@@ -19,11 +19,9 @@ Imports:
     dplyr,
     ggplot2
 Suggests: 
-    knitr,
     rmarkdown,
     rnaturalearth,
     rnaturalearthdata
-VignetteBuilder: knitr
 Depends: 
     R (>= 3.5)
 LazyData: true
