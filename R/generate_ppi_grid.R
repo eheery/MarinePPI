@@ -45,8 +45,9 @@ generate_ppi_grid <- function(lon,
 
   # Crop land to grid area
   if(!is.null(land_polygons)){
-    land_proj <- sf::st_combine( sf::st_transform(land_polygons, crs = crs_projected) )
-    land_reduced <- sf::st_buffer( land_proj, dist = land_buffer)
+    land_proj <- sf::st_transform(land_polygons, crs = crs_projected)
+    land_reduced <- sf::st_buffer( sf::st_combine( land_proj ), dist = land_buffer)
+    area_proj <- sf::st_intersection(land_proj, sf::st_as_sfc(bbox_wgs, crs = crs_projected)) # for returning
     area_land <- sf::st_intersection(sf::st_as_sfc(bbox_wgs, crs = crs_projected), land_reduced)
     area_water <- sf::st_difference( sf::st_as_sfc(bbox_wgs, crs = crs_projected), area_land )
     # Subset just grids that are not land (to cut down on the number of calculations needed)
@@ -90,11 +91,6 @@ generate_ppi_grid <- function(lon,
   final <- dplyr::left_join( final, sf::st_drop_geometry(locs_sf))
   final <- dplyr::rename( final, geometry = x)
   out <- list( PPI = final )
-  if(!is.null(land_polygons)){
-    out$Land <- area_land
-    bbox_poly <- sf::st_as_sfc(sf::st_bbox(area_land))
-    within_idx <- sf::st_within(final, bbox_poly, sparse = FALSE)[,1]
-    out$PPI <- final[within_idx, ]
-    }
+  if(!is.null(land_polygons)){  out$Land <- area_proj    }
   return(out)
 }
