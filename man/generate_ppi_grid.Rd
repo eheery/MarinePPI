@@ -7,13 +7,16 @@
 generate_ppi_grid(
   lon,
   lat,
-  buffer_km = c(5, 10, 20),
+  buffers_km = c(5, 10, 20),
   tile_schema,
   data_directory,
-  land_polygons,
-  grid_resolution_km = 1,
+  land_polygons = NULL,
+  grid_resolution_km = 10,
   locations_crs = 4326,
-  crs_projected = 3857
+  crs_projected = 3857,
+  land_buffer = -1000,
+  tif_prefix = "GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100_V1_0_",
+  progress = FALSE
 )
 }
 \arguments{
@@ -21,22 +24,28 @@ generate_ppi_grid(
 
 \item{lat}{Numeric vector of length 2: latitudes in decimal degrees representing the range (or centroid) of the study area.}
 
-\item{buffer_km}{Numeric vector of one or more buffer radii (in kilometers) used to estimate PPI.}
+\item{buffers_km}{Numeric vector of one or more buffer radii (in kilometers) used to estimate PPI.}
 
 \item{tile_schema}{An sf object of GHSL tile polygons with a \code{tile_id} column}
 
 \item{data_directory}{The base directory containing "downloads" and "mosaics" folders}
 
-\item{land_polygons}{An \code{sf} object representing land areas (e.g., from Natural Earth or OpenStreetMap).}
+\item{land_polygons}{A \code{sf} polygon object for land masses within the study area for which PPI calculations will be skipped (as a means of reducing computation time). Default = NULL.}
 
-\item{grid_resolution_km}{Numeric. Width and height of grid cells in kilometers.}
+\item{grid_resolution_km}{Numeric. Width and height of grid cells in kilometers. Default is 10 km; a finer resolution (ex: 1km) will provide a finer gradient and nicer visual, but takes a lot longer to run.}
 
 \item{locations_crs}{CRS code for the input coordinates (default is 4326)}
 
 \item{crs_projected}{CRS to use for grid generation and area calculations (default: 3857 Web Mercator).}
+
+\item{land_buffer}{Negative buffer distance (in meters) assumed for the land polygon (if provided) in case of inprecise mapping (so as not to eliminate grid cells from PPI calculations that aren't actually land). Default = 1000 m.}
+
+\item{tif_prefix}{Prefix used in naming .tif files (default matches GHSL 2023 dataset)}
+
+\item{progress}{Logical. If TRUE, show progress bars in exact_extract}
 }
 \value{
-A \code{data.frame} of grid centroids and PPI estimates at each buffer distance.
+A \code{list} of PPI, an \code{sf} polygon object of grid cells with computed PPI estimates for each buffer distance, and (if land polygons were provided) Land, the cropped land polygons in the same coordinate reference system as grid polygons.
 }
 \description{
 Creates a regular spatial grid across a user-specified bounding box with an added buffer.

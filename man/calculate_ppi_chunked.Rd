@@ -6,6 +6,8 @@
 \usage{
 calculate_ppi_chunked(
   locations,
+  longitude_col = 1,
+  latitude_col = 2,
   tile_schema,
   data_directory,
   buffers_km = c(5, 10, 20),
@@ -15,7 +17,11 @@ calculate_ppi_chunked(
 )
 }
 \arguments{
-\item{locations}{A data frame or matrix with longitude and latitude (in that order)}
+\item{locations}{A data frame or matrix with longitude and latitude}
+
+\item{longitude_col}{The column containing longitude in decimal degrees (character or numeric); defaults to column 1}
+
+\item{latitude_col}{The column containing latitude in decimal degrees (character or numeric); defaults to column 2}
 
 \item{tile_schema}{An sf object of GHSL tile polygons with a \code{tile_id} column}
 
