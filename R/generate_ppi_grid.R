@@ -90,6 +90,11 @@ generate_ppi_grid <- function(lon,
   final <- dplyr::left_join( final, sf::st_drop_geometry(locs_sf))
   final <- dplyr::rename( final, geometry = x)
   out <- list( PPI = final )
-  if(!is.null(land_polygons)){out$Land <- area_land }
+  if(!is.null(land_polygons)){
+    out$Land <- area_land
+    bbox_poly <- sf::st_as_sfc(sf::st_bbox(area_land))
+    within_idx <- sf::st_within(final, bbox_poly, sparse = FALSE)[,1]
+    out$PPI <- final[within_idx, ]
+    }
   return(out)
 }
