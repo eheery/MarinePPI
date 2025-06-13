@@ -17,6 +17,7 @@
 #' @param land_buffer Negative buffer distance (in meters) assumed for the land polygon (if provided) in case of inprecise mapping (so as not to eliminate grid cells from PPI calculations that aren't actually land). Default = 1000 m.
 #' @return A \code{list} of PPI, an \code{sf} polygon object of grid cells with computed PPI estimates for each buffer distance, and (if land polygons were provided) Land, the cropped land polygons in the same coordinate reference system as grid polygons.
 #' @param tif_prefix Prefix used in naming .tif files (default matches GHSL 2023 dataset)
+#' @param progress Logical. If TRUE, show progress bars in exact_extract
 #' @export
 generate_ppi_grid <- function(lon,
                               lat,
@@ -28,7 +29,8 @@ generate_ppi_grid <- function(lon,
                               locations_crs = 4326,
                               crs_projected = 3857,
                               land_buffer = -1000,
-                              tif_prefix = "GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100_V1_0_") {
+                              tif_prefix = "GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100_V1_0_",
+                              progress = FALSE) {
 
   requireNamespace("sf")
   requireNamespace("terra")
