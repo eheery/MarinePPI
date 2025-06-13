@@ -187,7 +187,7 @@ salish_sea_region <- list(
 # Land polygons
 land <- rnaturalearth::ne_countries(scale = "large", returnclass = "sf")
 
-# Compute PPI within a 20km radius for 5 km grid cells with bounds defined by the min lat and lon in salish_sea_region
+# Compute PPI gradient
 ppi_gradient <- generate_ppi_grid(
   lon = salish_sea_region$lon,
   lat = salish_sea_region$lat,
@@ -197,7 +197,7 @@ ppi_gradient <- generate_ppi_grid(
   land_polygons = land,
   grid_resolution_km = 5) # 5 km x 5 km grid cells
 
-
+# Visualize
 ggplot() + 
   geom_sf(data = ppi_gradient$PPI, aes(fill = PPI20km), color = NA) +
   geom_sf(data = ppi_gradient$Land ) +
@@ -208,6 +208,15 @@ The rudamentary map shown here is provided for visualizing purposes
 only. For more advanced mapping, one can save the spatial data layer
 generated from *generate_ppi_grid()* as a shapefile (using the *sf*
 function *st_write()*).
+
+<figure>
+<img src="man/figures/salish_sea_map.png"
+alt="Fig. 1 Visualization of PPI gradient computed for the Salish Sea region. Code for generating the figure is shown above, using a 20km buffer radius for 5 km resolution for grid cells." />
+<figcaption aria-hidden="true">Fig. 1 Visualization of PPI gradient
+computed for the Salish Sea region. Code for generating the figure is
+shown above, using a 20km buffer radius for 5 km resolution for grid
+cells.</figcaption>
+</figure>
 
 # Contributing
 
