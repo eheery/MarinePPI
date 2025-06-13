@@ -19,7 +19,7 @@ Install the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("eheery/MarinePPI")
+devtools::install_github("eheery/MarinePPI", build_vignettes = TRUE)
 ```
 
 ## Getting Started

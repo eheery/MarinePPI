@@ -27,7 +27,7 @@ This is especially useful in coastal and nearshore marine studies where traditio
 You can install the development version of MarinePPI as follows:
 
 ```{r eval = FALSE}
-devtools::install_github("eheery/MarinePPI")
+devtools::install_github("eheery/MarinePPI", build_vignettes = TRUE)
 ```
 
 Next, load the package into your R workspace:
