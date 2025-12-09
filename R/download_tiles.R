@@ -17,8 +17,9 @@ download_tiles <- function(tile_list,
   if (is.null(URL)) {
     URL <- paste0(
       "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/",
-      "GHS_BUILT_S_GLOBE_R2023A/GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100/",
-      "V1-0/tiles/"
+      "GHS_BUILT_S_GLOBE_R2023A/",
+      gsub("_V1_0_", "", tif_prefix),
+      "/V1-0/tiles/"
     )
   }
 
