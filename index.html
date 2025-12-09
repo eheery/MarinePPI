@@ -168,10 +168,10 @@
 <span>  grid_resolution_km <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="co"># 5 km x 5 km grid cells</span></span>
 <span></span>
 <span><span class="co"># Visualize</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ppi_gradient</span><span class="op">$</span><span class="va">PPI</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">PPI20km</span><span class="op">)</span>, color <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ppi_gradient</span><span class="op">$</span><span class="va">Land</span> <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_sf</span><span class="op">(</span>data <span class="op">=</span> <span class="va">ppi_gradient</span><span class="op">$</span><span class="va">PPI</span>, <span class="fu">aes</span><span class="op">(</span>fill <span class="op">=</span> <span class="va">PPI20km</span><span class="op">)</span>, color <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_sf</span><span class="op">(</span>data <span class="op">=</span> <span class="va">ppi_gradient</span><span class="op">$</span><span class="va">Land</span> <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The rudamentary map shown here is provided for visualizing purposes only. For more advanced mapping, one can save the spatial data layer generated from <em>generate_ppi_grid()</em> as a shapefile (using the <em>sf</em> function <em>st_write()</em>).</p>
 <figure><img src="reference/figures/salish_sea_map.png" alt="Fig. 1 Visualization of PPI gradient computed for the Salish Sea region. Code for generating the figure is shown above, using a 20km buffer radius for 5 km resolution for grid cells."><figcaption aria-hidden="true">
 Fig. 1 Visualization of PPI gradient computed for the Salish Sea region. Code for generating the figure is shown above, using a 20km buffer radius for 5 km resolution for grid cells.
@@ -229,7 +229,7 @@ Fig. 1 Visualization of PPI gradient computed for the Salish Sea region. Code fo
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
