@@ -31,8 +31,8 @@ calculate_ppi_chunked <- function(locations,
 
   # Step 2: Get tile list and raster paths
   tile_list <- get_tile_list(locs_sf, tile_schema, buffers_km)
-  tile_status <- download_tiles(tile_list, data_directory = data_directory)
-  mosaic_files <- create_tile_mosaics(tile_list, data_directory = data_directory)
+  tile_status <- download_tiles(tile_list, data_directory = data_directory, tif_prefix = tif_prefix)
+  mosaic_files <- create_tile_mosaics(tile_list, data_directory = data_directory,  tif_prefix = tif_prefix)
   raster_paths <- get_rasters(tile_list, data_directory = data_directory, tif_prefix = tif_prefix, return_paths = TRUE)
 
   # Step 3: Assign file path to each location
