@@ -7,7 +7,7 @@
 get_rasters(
   tile_list,
   data_directory,
-  tif_prefix = "GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100_V1_0_",
+  tif_prefix = "GHS_POP_E2030_GLOBE_R2023A_54009_100_V1_0_",
   return_paths = FALSE
 )
 }
