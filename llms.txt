@@ -10,6 +10,7 @@ summaries with customizable buffers.
 Install the development version from GitHub with:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("eheery/MarinePPI")
 ```
@@ -17,6 +18,7 @@ devtools::install_github("eheery/MarinePPI")
 Next, load the package into your R workspace:
 
 ``` r
+
 library(MarinePPI)
 ```
 
@@ -51,6 +53,7 @@ directory. Just ensure the directory exists and that you have write
 access.
 
 ``` r
+
 # Specify raster directory on your computer
 raster_directory <- "your raster directory filepath"
 ```
@@ -79,6 +82,7 @@ you will need to specify this in the \`locations_crs\` argument of the
 *get_tile_list()* function below).
 
 ``` r
+
 # Load sample data set
 data("PugetSoundSites")
 ```
@@ -93,6 +97,7 @@ kilometers. Here, we use an example of 5 buffer distances between 1 km
 and 20 km:
 
 ``` r
+
 # Specify radii for PPI calculations IN KILOMETERS
 b <- c(1, 2, 5, 10, 20)
 ```
@@ -104,6 +109,7 @@ discern which tiles overlap with our field sites and buffer distances.
 We do this using teh *get_tile_schema()* function:
 
 ``` r
+
 schema <- get_tile_schema(data_directory = raster_directory)
 ```
 
@@ -118,6 +124,7 @@ combination of raster tiles associated with our respective field sites
 and maximum buffer distance. It returns an *sf* points file
 
 ``` r
+
 ppi_estimates <- calculate_ppi_chunked(
   locations = PugetSoundSites,
   longitude_col = "Lon_dd",
@@ -140,6 +147,7 @@ directory. Here’s an example using coordinates from the coast of Eastern
 Australia:
 
 ``` r
+
 # Study area as defined by coordinates in eastern Australia
 data("EasternAustraliaSites")
 
@@ -168,6 +176,7 @@ on computation time (when land_polygons != NULL, PPI calculations are
 skipped for grid cells that overlap completely with land).
 
 ``` r
+
 library(ggplot2)
 
 # Set bounds 
