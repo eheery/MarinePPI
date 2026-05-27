@@ -20,7 +20,7 @@ generate_ppi_grid(
   locations_crs = 4326,
   crs_projected = 3857,
   land_buffer = -1000,
-  tif_prefix = "GHS_BUILT_S_E2030_GLOBE_R2023A_54009_100_V1_0_",
+  tif_prefix = "GHS_POP_E2030_GLOBE_R2023A_54009_100_V1_0_",
   progress = FALSE
 )
 ```

@@ -6,9 +6,11 @@
 <url><loc>https://eheery.github.io/MarinePPI/index.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/EasternAustraliaSites.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/PugetSoundSites.html</loc></url>
+<url><loc>https://eheery.github.io/MarinePPI/reference/calculate_ghs_chunked.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/calculate_ppi.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/calculate_ppi_chunked.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/create_tile_mosaics.html</loc></url>
+<url><loc>https://eheery.github.io/MarinePPI/reference/download_ghs_tiles.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/download_tiles.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/generate_ppi_grid.html</loc></url>
 <url><loc>https://eheery.github.io/MarinePPI/reference/get_rasters.html</loc></url>

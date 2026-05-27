@@ -1,11 +1,11 @@
-# Chunked PPI calculation for each unique tile or mosaic combination
+# Chunked focal means calculations from the GHS layer specified
 
-Chunked PPI calculation for each unique tile or mosaic combination
+Chunked focal means calculations from the GHS layer specified
 
 ## Usage
 
 ``` r
-calculate_ppi_chunked(
+calculate_ghs_chunked(
   locations,
   longitude_col = 1,
   latitude_col = 2,
@@ -13,7 +13,10 @@ calculate_ppi_chunked(
   data_directory,
   buffers_km = c(5, 10, 20),
   locations_crs = 4326,
-  tif_prefix = "GHS_POP_E2030_GLOBE_R2023A_54009_100_V1_0_",
+  ghs_layer = "BUILT_S",
+  ghs_year = 2030,
+  ghs_epsg = 54009,
+  ghs_resolution = "100",
   progress = FALSE
 )
 ```
@@ -50,9 +53,22 @@ calculate_ppi_chunked(
 
   CRS code for the input coordinates (default is 4326)
 
-- tif_prefix:
+- ghs_layer:
 
-  Prefix used in naming .tif files (default matches GHSL 2023 dataset)
+  GHS layer of interest (default: BUILT_S)
+
+- ghs_year:
+
+  GHS layer year of interest (default: 2030)
+
+- ghs_epsg:
+
+  GHS layer coordinate reference system of interest (default: 54009 -
+  Mollweide)
+
+- ghs_resolution:
+
+  GHS layer resolution of interest (default: 100 meters)
 
 - progress:
 

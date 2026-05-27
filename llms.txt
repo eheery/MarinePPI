@@ -235,6 +235,8 @@ This package is licensed under the MIT License.
   : Made-Up Marine Sites in Eastern Australia
 - [`PugetSoundSites`](https://eheery.github.io/MarinePPI/reference/PugetSoundSites.md)
   : Puget Sound Sampling Locations
+- [`calculate_ghs_chunked()`](https://eheery.github.io/MarinePPI/reference/calculate_ghs_chunked.md)
+  : Chunked focal means calculations from the GHS layer specified
 - [`calculate_ppi()`](https://eheery.github.io/MarinePPI/reference/calculate_ppi.md)
   : Calculate PPI for a set of sites or grid cells given one or more
   buffer distances
@@ -242,6 +244,8 @@ This package is licensed under the MIT License.
   : Chunked PPI calculation for each unique tile or mosaic combination
 - [`create_tile_mosaics()`](https://eheery.github.io/MarinePPI/reference/create_tile_mosaics.md)
   : Create raster mosaics for unique tile combinations
+- [`download_ghs_tiles()`](https://eheery.github.io/MarinePPI/reference/download_ghs_tiles.md)
+  : Check for missing GHS raster tiles and download them if needed
 - [`download_tiles()`](https://eheery.github.io/MarinePPI/reference/download_tiles.md)
   : Check for missing GHS raster tiles and download them if needed
 - [`generate_ppi_grid()`](https://eheery.github.io/MarinePPI/reference/generate_ppi_grid.md)

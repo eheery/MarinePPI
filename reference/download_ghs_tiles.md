@@ -5,11 +5,14 @@ Check for missing GHS raster tiles and download them if needed
 ## Usage
 
 ``` r
-download_tiles(
+download_ghs_tiles(
   tile_list,
   data_directory,
   URL = NULL,
-  tif_prefix = "GHS_POP_E2030_GLOBE_R2023A_54009_100_V1_0_"
+  ghs_layer = "BUILT_S",
+  ghs_year = 2030,
+  ghs_epsg = 54009,
+  ghs_resolution = "100"
 )
 ```
 
@@ -27,9 +30,22 @@ download_tiles(
 
   Base URL of the GHSL raster zip file library
 
-- tif_prefix:
+- ghs_layer:
 
-  Prefix used in naming the .tif files
+  GHS layer of interest (default: BUILT_S)
+
+- ghs_year:
+
+  GHS layer year of interest (default: 2030)
+
+- ghs_epsg:
+
+  GHS layer coordinate reference system of interest (default: 54009 -
+  Mollweide)
+
+- ghs_resolution:
+
+  GHS layer resolution of interest (default: 100 meters)
 
 ## Value
 
