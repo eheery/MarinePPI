@@ -19,7 +19,7 @@ calculate_ppi_chunked <- function(locations,
                                   data_directory,
                                   buffers_km = c(5, 10, 20),
                                   locations_crs = 4326,
-                                  tif_prefix = "GHS_POP_S_E2030_GLOBE_R2023A_54009_100_V1_0_",
+                                  tif_prefix = "GHS_POP_E2030_GLOBE_R2023A_54009_100_V1_0_",
                                   progress = FALSE) {
   # Step 1: Get locations as an sf object
   if( inherits(locations, "sf") ){
