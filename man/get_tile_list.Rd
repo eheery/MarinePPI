@@ -4,12 +4,25 @@
 \alias{get_tile_list}
 \title{Identify GHSL tile IDs needed to cover spatial locations with a specified buffer}
 \usage{
-get_tile_list(locs_sf, tile_schema, buffers_km = 10)
+get_tile_list(
+  locations,
+  longitude_col = 1,
+  latitude_col = 2,
+  tile_schema,
+  locations_crs = 4326,
+  buffers_km = 10
+)
 }
 \arguments{
-\item{locs_sf}{An sf object of sites (or grid polygons).}
+\item{locations}{A data frame or matrix with longitude and latitude}
+
+\item{longitude_col}{The column containing longitude in decimal degrees (character or numeric); defaults to column 1}
+
+\item{latitude_col}{The column containing latitude in decimal degrees (character or numeric); defaults to column 2}
 
 \item{tile_schema}{An \code{sf} object representing the GHSL tile grid schema, with a \code{tile_id} column.}
+
+\item{locations_crs}{CRS code for the input coordinates (default is 4326)}
 
 \item{buffers_km}{Numeric buffer radius in kilometers (default is 10).}
 }
