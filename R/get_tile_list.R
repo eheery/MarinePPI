@@ -4,7 +4,9 @@
 #' this function identifies which GHSL population raster tiles intersect a buffer
 #' of a specified radius around each point. It returns a list of tile ID vectors, one per input point.
 #'
-#' @param locs_sf An sf object of sites (or grid polygons).
+#' @param locations A data frame or matrix with longitude and latitude
+#' @param longitude_col The column containing longitude in decimal degrees (character or numeric); defaults to column 1
+#' @param latitude_col The column containing latitude in decimal degrees (character or numeric); defaults to column 2
 #' @param tile_schema An `sf` object representing the GHSL tile grid schema, with a `tile_id` column.
 #' @param buffers_km Numeric buffer radius in kilometers (default is 10).
 #'
@@ -19,10 +21,18 @@
 #'
 #' @export
 get_tile_list <- function(
-    locs_sf,
+    locations,
+    longitude_col = 1,
+    latitude_col = 2,
     tile_schema,
     buffers_km = 10){
 
+
+  if( inherits(locations, "sf") ){
+    locs_sf <- sf::st_transform( locations, crs = locations_crs)
+  }else{
+    # Convert locations to sf
+    locs_sf <- sf::st_as_sf(locations, coords = c(longitude_col, latitude_col), crs = locations_crs)}
 
   x <- sf::st_transform(locs_sf, crs = sf::st_crs(tile_schema))
 
