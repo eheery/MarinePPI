@@ -8,6 +8,7 @@
 #' @param longitude_col The column containing longitude in decimal degrees (character or numeric); defaults to column 1
 #' @param latitude_col The column containing latitude in decimal degrees (character or numeric); defaults to column 2
 #' @param tile_schema An `sf` object representing the GHSL tile grid schema, with a `tile_id` column.
+#' @param locations_crs CRS code for the input coordinates (default is 4326)
 #' @param buffers_km Numeric buffer radius in kilometers (default is 10).
 #'
 #' @return A list of character vectors, each containing the GHSL tile IDs intersecting the buffer around a location.
