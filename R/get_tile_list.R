@@ -25,6 +25,7 @@ get_tile_list <- function(
     longitude_col = 1,
     latitude_col = 2,
     tile_schema,
+    locations_crs = 4326,
     buffers_km = 10){
 
 
