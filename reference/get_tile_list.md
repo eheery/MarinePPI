@@ -8,19 +8,40 @@ It returns a list of tile ID vectors, one per input point.
 ## Usage
 
 ``` r
-get_tile_list(locs_sf, tile_schema, buffers_km = 10)
+get_tile_list(
+  locations,
+  longitude_col = 1,
+  latitude_col = 2,
+  tile_schema,
+  locations_crs = 4326,
+  buffers_km = 10
+)
 ```
 
 ## Arguments
 
-- locs_sf:
+- locations:
 
-  An sf object of sites (or grid polygons).
+  A data frame or matrix with longitude and latitude
+
+- longitude_col:
+
+  The column containing longitude in decimal degrees (character or
+  numeric); defaults to column 1
+
+- latitude_col:
+
+  The column containing latitude in decimal degrees (character or
+  numeric); defaults to column 2
 
 - tile_schema:
 
   An `sf` object representing the GHSL tile grid schema, with a
   `tile_id` column.
+
+- locations_crs:
+
+  CRS code for the input coordinates (default is 4326)
 
 - buffers_km:
 

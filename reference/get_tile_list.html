@@ -43,19 +43,38 @@ of a specified radius around each point. It returns a list of tile ID vectors, o
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_tile_list</span><span class="op">(</span><span class="va">locs_sf</span>, <span class="va">tile_schema</span>, buffers_km <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_tile_list</span><span class="op">(</span></span>
+<span>  <span class="va">locations</span>,</span>
+<span>  longitude_col <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  latitude_col <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  <span class="va">tile_schema</span>,</span>
+<span>  locations_crs <span class="op">=</span> <span class="fl">4326</span>,</span>
+<span>  buffers_km <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-locs-sf">locs_sf<a class="anchor" aria-label="anchor" href="#arg-locs-sf"></a></dt>
-<dd><p>An sf object of sites (or grid polygons).</p></dd>
+<dl><dt id="arg-locations">locations<a class="anchor" aria-label="anchor" href="#arg-locations"></a></dt>
+<dd><p>A data frame or matrix with longitude and latitude</p></dd>
+
+
+<dt id="arg-longitude-col">longitude_col<a class="anchor" aria-label="anchor" href="#arg-longitude-col"></a></dt>
+<dd><p>The column containing longitude in decimal degrees (character or numeric); defaults to column 1</p></dd>
+
+
+<dt id="arg-latitude-col">latitude_col<a class="anchor" aria-label="anchor" href="#arg-latitude-col"></a></dt>
+<dd><p>The column containing latitude in decimal degrees (character or numeric); defaults to column 2</p></dd>
 
 
 <dt id="arg-tile-schema">tile_schema<a class="anchor" aria-label="anchor" href="#arg-tile-schema"></a></dt>
 <dd><p>An <code>sf</code> object representing the GHSL tile grid schema, with a <code>tile_id</code> column.</p></dd>
+
+
+<dt id="arg-locations-crs">locations_crs<a class="anchor" aria-label="anchor" href="#arg-locations-crs"></a></dt>
+<dd><p>CRS code for the input coordinates (default is 4326)</p></dd>
 
 
 <dt id="arg-buffers-km">buffers_km<a class="anchor" aria-label="anchor" href="#arg-buffers-km"></a></dt>
